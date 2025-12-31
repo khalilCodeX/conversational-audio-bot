@@ -166,9 +166,12 @@ def main():
     # Voice tab
     with tab1:
         st.subheader("Voice Input")
-        if st.button("Start Recording"):
-            handle_audio_input()
-        uploaded_file = st.file_uploader("Or upload audio file", type=["wav", "mp3"])
+        if audio_processor.recording_available:
+            if st.button("Start Recording"):
+                handle_audio_input()
+        else:
+            st.warning("🎤 Microphone recording is not available in this environment. Please upload an audio file instead.")
+        uploaded_file = st.file_uploader("Upload audio file", type=["wav", "mp3"])
         if uploaded_file:
             handle_uploaded_audio(uploaded_file)
 

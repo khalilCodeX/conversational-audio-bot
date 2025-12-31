@@ -1,4 +1,10 @@
-import sounddevice as sd
+try:
+    import sounddevice as sd
+    SOUNDDEVICE_AVAILABLE = True
+except ImportError:
+    SOUNDDEVICE_AVAILABLE = False
+    sd = None
+
 import soundfile as sf
 import numpy as np
 import tempfile
@@ -21,8 +27,11 @@ class AudioProcessor:
         """
         self.sample_rate = sample_rate
         self.temp_dir = tempfile.mkdtemp()
+        self.recording_available = SOUNDDEVICE_AVAILABLE
         print(f"AudioProcessor initialized with sample rate {self.sample_rate} Hz")
         print(f"Temporary files will be stored in: {self.temp_dir}")
+        if not SOUNDDEVICE_AVAILABLE:
+            print("Warning: sounddevice not available. Recording disabled.")
 
     def record_audio(self, duration: int = 10) -> Optional[str]:
         """
@@ -31,6 +40,10 @@ class AudioProcessor:
         Args:
             duration: Duration to record in seconds
         """
+        if not SOUNDDEVICE_AVAILABLE:
+            print("Recording not available: sounddevice not installed")
+            return None
+            
         try:
             print(f"Recording audio for {duration} seconds...")
             reording  = sd.rec(int(duration * self.sample_rate), 
