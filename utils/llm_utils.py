@@ -6,6 +6,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_openai_api_key():
+    """Get OpenAI API key from environment or Streamlit secrets"""
+    # Try environment variable first
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        return api_key
+    
+    # Try Streamlit secrets (for Streamlit Cloud deployment)
+    try:
+        import streamlit as st
+        if hasattr(st, 'secrets') and 'OPENAI_API_KEY' in st.secrets:
+            return st.secrets['OPENAI_API_KEY']
+    except Exception:
+        pass
+    
+    return None
+
 class LLMProcessor:
     def __init__(self, model_name: str = "gpt-4", temperature: float = 0.7):
         """
@@ -20,7 +37,7 @@ class LLMProcessor:
         self.chat = ChatOpenAI(
             model_name=self.model_name,
             temperature=self.temperature,
-            openai_api_key=os.getenv("OPENAI_API_KEY")
+            openai_api_key=get_openai_api_key()
         )
 
         # Default system prompt
